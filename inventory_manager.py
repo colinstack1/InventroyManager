@@ -44,6 +44,15 @@ def load_inventory(filename):
     
     return inventory
 
+def save_inventory(inventory, filename):
+    """ Save all the inventory items to a txt file"""
+    with open(filename, "w") as file:
+        for item in inventory:
+            name = item["name"]
+            category = item["category"]
+            quantity = item["quantity"]
+
+            file.write(f"{name}|{category}|{quantity}\n")
 
 
 
@@ -53,6 +62,8 @@ def main():
     
     """ Run the inventory management system until the user chooses to exit """
     inventory = load_inventory(INVENTORY_FILE)
+
+
     while True:
         display_menu()
         choice = input("Choose an option: ").strip()
