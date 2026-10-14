@@ -55,7 +55,16 @@ def save_inventory(inventory, filename):
             file.write(f"{name}|{category}|{quantity}\n")
 
 
+def view_inventory(inventory):
+    """ Dsiplaying all the inventory items in a numbered list"""
+    if not inventory:
+        print("No inventory items found.")
+        return
+    
+    print("\nInventory")
 
+    for number, item in enumerate(inventory, start=1):
+        print(f'{number}. {item["name"]} | {item["category"]} | Quantity: {item["quantity"]}')
 
 
 def main():
@@ -63,15 +72,17 @@ def main():
     """ Run the inventory management system until the user chooses to exit """
     inventory = load_inventory(INVENTORY_FILE)
 
-
     while True:
         display_menu()
         choice = input("Choose an option: ").strip()
         
-        if choice == "7":
+        if choice == "1":
             print("Thank you for using Inventory Manager!")
             break
-        elif choice in ["1", "2", "3", "4", "5", "6"]:
+        elif choice == "7":
+            print("Thank you for using Inventory Manager!")
+            break
+        elif choice in ["2", "3", "4", "5", "6"]:
             print("This feature has not been implemented yet.")
         else:
             print("Invalid option. please select a number from 1 to 7.")
