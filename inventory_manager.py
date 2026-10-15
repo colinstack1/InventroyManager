@@ -193,6 +193,42 @@ def search_inventory(inventory):
     view_inventory(matches)
 
 
+def display_summary(inventory):
+    """Display inventory totals, low stock items, and category counts."""
+    unique_items = len(inventory)
+    total_quantity = 0
+    low_stock_items = 0
+    category_counts = {}
+
+    for item in inventory:
+        total_quantity += item["quantity"]
+
+        if item["quantity"] < 5:
+            low_stock_items += 1
+        
+        category = item["category"].strip()
+        category_key = category.lower()
+
+        if category_key not in category_counts:
+            category_counts[category_key] = {
+                "name": category,
+                "count": 0
+            }
+        category_counts[category_key]["count"] += 1
+
+
+    print("\nInventory Summary")
+    print(f"Unique items: {unique_items}")
+    print(f"Total quantity: {total_quantity}")
+    print(f"Low-stock items: {low_stock_items}")
+
+    print("\nItems by category: ")
+
+    for category_info in category_counts.values():
+        print(f'{category_info["name"]}: {category_info["count"]}')
+
+
+
 
 def main():
     
@@ -218,11 +254,13 @@ def main():
         elif choice == "5":
             search_inventory(inventory)
         
+        elif choice == "6":
+            display_summary(inventory)
+
         elif choice == "7":
             print("Thank you for using Inventory Manager!")
             break
-        elif choice in ["6"]:
-            print("This feature has not been implemented yet.")
+
         else:
             print("Invalid option. please put a valid number.")
 
