@@ -171,6 +171,29 @@ def remove_item(inventory):
     save_inventory(inventory, INVENTORY_FILE)
 
 
+def search_inventory(inventory):
+    """Search inventory items by name using case insensitive partial matching."""
+    search_term = input("Enter an item name to search: ").strip()
+
+    if not search_term:
+        print("Search term cannot be empty.")
+        return
+    
+    matches = []
+
+    for item in inventory:
+        if search_term.lower() in item["name"].lower():
+            matches.append(item)
+
+    if not matches:
+        print("No inventory items matched your search.")
+        return
+    
+    print("\nSearch Results:")
+    view_inventory(matches)
+
+
+
 def main():
     
     """ Run the inventory management system until the user chooses to exit """
@@ -191,10 +214,14 @@ def main():
             
         elif choice == "4":
             remove_item(inventory)
+
+        elif choice == "5":
+            search_inventory(inventory)
+        
         elif choice == "7":
             print("Thank you for using Inventory Manager!")
             break
-        elif choice in ["5", "6"]:
+        elif choice in ["6"]:
             print("This feature has not been implemented yet.")
         else:
             print("Invalid option. please put a valid number.")
