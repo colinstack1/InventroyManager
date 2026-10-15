@@ -67,6 +67,52 @@ def view_inventory(inventory):
         print(f'{number}. {item["name"]} | {item["category"]} | Quantity: {item["quantity"]}')
 
 
+def add_item(inventory):
+    """Add a new inventory item after validating user input"""
+    name = input("Enter the item name: ").strip()
+
+    if not name:
+        print("Item name cannot be empty.")
+        return
+    
+    if "|" in name:
+        print("Item name cant contain the | character.")
+        return
+    
+    for item in inventory:
+        if item["name"].lower() == name.lower():
+            print("An item with that name already exists.")
+            return
+        
+    category = input("Enter the category: ").strip()
+
+    if not category:
+        print("Category cannot be empty.")
+        return
+    if "|" in category:
+        print("Category cannot contain the | character.")
+        return
+    
+    quantity_input = input("Enter the quantity: ").strip()
+
+    if not quantity_input.isascii() or not quantity_input.isdecimal():
+        print("Quantity must be a nonnegative whole number.")
+        return
+    quantity = int(quantity_input)
+
+    new_item = {
+        "name": name,
+        "category": category,
+        "quantity": quantity
+    }
+        
+    inventory.append(new_item)
+
+    print("Item added successfully.")
+    save_inventory(inventory, INVENTORY_FILE)
+
+
+
 def main():
     
     """ Run the inventory management system until the user chooses to exit """
@@ -77,15 +123,18 @@ def main():
         choice = input("Choose an option: ").strip()
         
         if choice == "1":
-            print("Thank you for using Inventory Manager!")
-            break
+            view_inventory(inventory)
+        
+        elif choice == "2":
+            add_item(inventory)
+            
         elif choice == "7":
             print("Thank you for using Inventory Manager!")
             break
-        elif choice in ["2", "3", "4", "5", "6"]:
+        elif choice in ["3", "4", "5", "6"]:
             print("This feature has not been implemented yet.")
         else:
-            print("Invalid option. please select a number from 1 to 7.")
+            print("Invalid option. please put a valid number.")
 
 
 if __name__ == "__main__":
