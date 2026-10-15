@@ -146,6 +146,29 @@ def update_quantity(inventory):
     save_inventory(inventory, INVENTORY_FILE)
 
 
+def remove_item(inventory):
+    """Remove an inventory item that was selected by the user"""
+    if not inventory:
+        print("No inventory item found.")
+        return
+    
+    view_inventory(inventory)
+
+    selection = input("Enter the item number to remove: ").strip()
+
+    if not selection.isascii() or not selection.isdecimal():
+        print("Please enter a valid item number.")
+        return
+
+    item_number = int(selection)
+
+    if item_number < 1 or item_number > len(inventory):
+        print("That item number does not exist.")
+        return
+    removed_item = inventory.pop(item_number - 1)
+    
+    print(f'Item removed: {removed_item["name"]}')
+    save_inventory(inventory, INVENTORY_FILE)
 
 
 def main():
@@ -166,10 +189,12 @@ def main():
         elif choice == "3":
             update_quantity(inventory)
             
+        elif choice == "4":
+            remove_item(inventory)
         elif choice == "7":
             print("Thank you for using Inventory Manager!")
             break
-        elif choice in ["4", "5", "6"]:
+        elif choice in ["5", "6"]:
             print("This feature has not been implemented yet.")
         else:
             print("Invalid option. please put a valid number.")
