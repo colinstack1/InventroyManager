@@ -5,3 +5,5 @@ Mouse|Accessories|3
 Printer|Printers|6
 HDMI Cable|Electronic|6
 USB Hub|Electronic|0
+temp item|Electronic|7
+tempItem|Electronic|5
