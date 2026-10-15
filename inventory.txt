@@ -1,4 +1,4 @@
-Laptop|Computers|10
+Laptop|Computers|20
 Monitor|Displays|8
 Keyboard|Accessories|15
 Mouse|Accessories|3
