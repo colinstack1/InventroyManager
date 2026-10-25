@@ -8,6 +8,7 @@ from inventory_manager import (
     find_matching_items,
     remove_item_by_number,
     update_item_quantity,
+    validate_new_item,
 )
 
 @pytest.fixture
@@ -306,3 +307,95 @@ def test_update_rejects_negative_quantity(sample_inventory):
     # Assert
     assert result is False
     assert sample_inventory == original_inventory
+
+
+
+def test_validate_new_item_accepts_valid_item(sample_inventory):
+    # Arrange
+    name = "Webcam"
+    category = "Electronics"
+    quantity = 10
+
+    # Act
+    result = validate_new_item(
+        sample_inventory, name, category, quantity
+    )
+
+    # Assert
+    assert result is None
+
+
+@pytest.mark.parametrize(
+    "name, category, quantity, expected_error",
+    [
+        ("", "Electronics", 5, "Item name cannot be empty."),
+        ("Webcam", "", 5, "Category cannot be empty."),
+        ("Web|cam", "Electronics", 5,
+         "Item name cannot contain the | character."),
+        ("Webcam", "Elect|ronics", 5,
+         "Category cannot contain the | character."),
+        ("Webcam", "Electronics", -3,
+         "Quantity must be a nonnegative whole number."),
+        ("Laptop", "Electronics", 5,
+         "An item with that name already exists."),
+        ("lApToP", "Electronics", 5,
+         "An item with that name already exists."),
+    ],
+    ids=[
+        "empty-name",
+        "empty-category",
+        "pipe-in-name",
+        "pipe-in-category",
+        "negative-quantity",
+        "duplicate-name",
+        "duplicate-different-case",
+    ],
+)
+def test_validate_new_item_rejects_invalid_data(
+    sample_inventory, name, category, quantity, expected_error
+):
+    # Arrange
+    original_inventory = [
+        item.copy() for item in sample_inventory
+    ]
+
+    # Act
+    result = validate_new_item(
+        sample_inventory, name, category, quantity
+    )
+
+    # Assert
+    assert result == expected_error
+    assert sample_inventory == original_inventory
+
+
+def test_validate_new_item_rejects_nonnumeric_quantity(
+    sample_inventory
+):
+    # Arrange
+    name = "Webcam"
+    category = "Electronics"
+    quantity = "five"
+
+    # Act
+    result = validate_new_item(
+        sample_inventory, name, category, quantity
+    )
+
+    # Assert
+    assert result == "Quantity must be a nonnegative whole number."
+
+
+def test_validate_new_item_accepts_zero_quantity(sample_inventory):
+    # Arrange
+    name = "Webcam"
+    category = "Electronics"
+    quantity = 0
+
+    # Act
+    result = validate_new_item(
+        sample_inventory, name, category, quantity
+    )
+
+    # Assert
+    assert result is None

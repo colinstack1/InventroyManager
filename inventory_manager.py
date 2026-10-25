@@ -66,46 +66,83 @@ def view_inventory(inventory):
     for number, item in enumerate(inventory, start=1):
         print(f'{number}. {item["name"]} | {item["category"]} | Quantity: {item["quantity"]}')
 
+def validate_new_item(inventory, name, category, quantity):
+    """Validate a new inventory item and return an error or None."""
+    name = name.strip()
+    category = category.strip()
+
+    if not name:
+        return "Item name cannot be empty."
+
+    if "|" in name:
+        return "Item name cannot contain the | character."
+
+    for item in inventory:
+        if item["name"].lower() == name.lower():
+            return "An item with that name already exists."
+
+    if not category:
+        return "Category cannot be empty."
+
+    if "|" in category:
+        return "Category cannot contain the | character."
+
+    if not isinstance(quantity, int) or quantity < 0:
+        return "Quantity must be a nonnegative whole number."
+
+    return None
+
+
 
 def add_item(inventory):
-    """Add a new inventory item after validating user input"""
+    """Add a new inventory item after validating user input."""
     name = input("Enter the item name: ").strip()
 
     if not name:
         print("Item name cannot be empty.")
         return
-    
+
     if "|" in name:
-        print("Item name cant contain the | character.")
+        print("Item name cannot contain the | character.")
         return
-    
+
     for item in inventory:
         if item["name"].lower() == name.lower():
             print("An item with that name already exists.")
             return
-        
+
     category = input("Enter the category: ").strip()
 
     if not category:
         print("Category cannot be empty.")
         return
+
     if "|" in category:
         print("Category cannot contain the | character.")
         return
-    
+
     quantity_input = input("Enter the quantity: ").strip()
 
     if not quantity_input.isascii() or not quantity_input.isdecimal():
         print("Quantity must be a nonnegative whole number.")
         return
+
     quantity = int(quantity_input)
+
+    validation_error = validate_new_item(
+        inventory, name, category, quantity
+    )
+
+    if validation_error is not None:
+        print(validation_error)
+        return
 
     new_item = {
         "name": name,
         "category": category,
-        "quantity": quantity
+        "quantity": quantity,
     }
-        
+
     inventory.append(new_item)
 
     print("Item added successfully.")
@@ -165,7 +202,7 @@ def update_quantity(inventory):
         save_inventory(inventory, INVENTORY_FILE)
 
 
-        
+
 def remove_item_by_number(inventory, item_number):
     """Remove an inventory item using a one-based item number.
 
