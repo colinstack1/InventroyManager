@@ -113,48 +113,31 @@ def add_item(inventory):
 
 
 
+def update_item_quantity(inventory, item_number, new_quantity):
+    """Update an item's quantity using a one-based item number.
+
+    Return True if successful, or False for invalid values.
+    """
+    if item_number < 1 or item_number > len(inventory):
+        return False
+
+    if not isinstance(new_quantity, int) or new_quantity < 0:
+        return False
+
+    inventory[item_number - 1]["quantity"] = new_quantity
+    return True
+
+
+
 def update_quantity(inventory):
-    """Update the quantity of an existing inventory item"""
+    """Update the quantity of an existing inventory item."""
     if not inventory:
         print("No inventory item found.")
         return
+
     view_inventory(inventory)
 
     selection = input("Enter the item number to update: ").strip()
-
-    if not selection.isdecimal():
-        print("Please enter a valid item number.")
-        return 
-    
-    item_number=int(selection)
-
-    if item_number < 1 or item_number > len(inventory):
-        print("That item number does not exist.")
-        return 
-    quantity_input = input("Enter the new quantity: ").strip()
-
-    if not quantity_input.isascii() or not quantity_input.isdecimal():
-        print("Quantity must be a nonnegative whole number.")
-        return
-    new_quantity = int(quantity_input)
-
-    selected_item = inventory[item_number - 1]
-    selected_item["quantity"] = new_quantity
-
-    print(f'{selected_item["name"]} quantity updated to {new_quantity}.')
-
-    save_inventory(inventory, INVENTORY_FILE)
-
-
-def remove_item(inventory):
-    """Remove an inventory item that was selected by the user"""
-    if not inventory:
-        print("No inventory item found.")
-        return
-    
-    view_inventory(inventory)
-
-    selection = input("Enter the item number to remove: ").strip()
 
     if not selection.isascii() or not selection.isdecimal():
         print("Please enter a valid item number.")
@@ -165,8 +148,56 @@ def remove_item(inventory):
     if item_number < 1 or item_number > len(inventory):
         print("That item number does not exist.")
         return
-    removed_item = inventory.pop(item_number - 1)
-    
+
+    quantity_input = input("Enter the new quantity: ").strip()
+
+    if not quantity_input.isascii() or not quantity_input.isdecimal():
+        print("Quantity must be a nonnegative whole number.")
+        return
+
+    new_quantity = int(quantity_input)
+
+    updated = update_item_quantity(inventory, item_number, new_quantity)
+
+    if updated:
+        selected_item = inventory[item_number - 1]
+        print(f'{selected_item["name"]} quantity updated to {new_quantity}.')
+        save_inventory(inventory, INVENTORY_FILE)
+
+
+        
+def remove_item_by_number(inventory, item_number):
+    """Remove an inventory item using a one-based item number.
+
+    Return the removed item, or None if the number is invalid.
+    """
+    if item_number < 1 or item_number > len(inventory):
+        return None
+
+    return inventory.pop(item_number - 1)
+
+def remove_item(inventory):
+    """Remove an inventory item selected by the user."""
+    if not inventory:
+        print("No inventory item found.")
+        return
+
+    view_inventory(inventory)
+
+    selection = input("Enter the item number to remove: ").strip()
+
+    if not selection.isascii() or not selection.isdecimal():
+        print("Please enter a valid item number.")
+        return
+
+    item_number = int(selection)
+
+    removed_item = remove_item_by_number(inventory, item_number)
+
+    if removed_item is None:
+        print("That item number does not exist.")
+        return
+
     print(f'Item removed: {removed_item["name"]}')
     save_inventory(inventory, INVENTORY_FILE)
 
