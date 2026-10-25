@@ -1,7 +1,7 @@
 Laptop|Computers|25
 Monitor|Displays|8
-Keyboard|Accessories|15
 Mouse|Accessories|3
 Printer|Printers|6
 HDMI Cable|Electronic|6
 USB Hub|Electronic|0
+Keyboard|Accessories|15
