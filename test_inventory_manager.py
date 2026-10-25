@@ -9,6 +9,7 @@ from inventory_manager import (
     remove_item_by_number,
     update_item_quantity,
     validate_new_item,
+    calculate_summary,
 )
 
 @pytest.fixture
@@ -16,10 +17,9 @@ def sample_inventory():
     """Provide reusable inventory data for multiple tests."""
     return [
         {"name": "Laptop", "category": "Computers", "quantity": 10},
-        {"name": "Mouse", "category": "Accessories", "quantity": 10},
-        {"name": "Keyboard", "category": "Accessories", "quantity": 10},
-        {"name": "Monitor", "category": "Displays", "quantity": 10},
-
+        {"name": "Mouse", "category": "Accessories", "quantity": 3},
+        {"name": "Keyboard", "category": "Accessories", "quantity": 5},
+        {"name": "Monitor", "category": "Displays", "quantity": 8},
     ]
 
 def test_load_inventory_valid_file(tmp_path):
@@ -399,3 +399,118 @@ def test_validate_new_item_accepts_zero_quantity(sample_inventory):
 
     # Assert
     assert result is None
+
+
+
+# ---------------------------------------------------------
+# Inventory Summary Tests
+# ---------------------------------------------------------
+
+def test_summary_unique_items(sample_inventory):
+    # Arrange
+    expected = 4
+
+    # Act
+    result = calculate_summary(sample_inventory)
+
+    # Assert
+    assert result["unique_items"] == expected
+
+
+def test_summary_total_quantity(sample_inventory):
+    # Arrange
+    expected = 26
+
+    # Act
+    result = calculate_summary(sample_inventory)
+
+    # Assert
+    assert result["total_quantity"] == expected
+
+
+def test_summary_low_stock_items(sample_inventory):
+    # Arrange
+    expected = 1
+
+    # Act
+    result = calculate_summary(sample_inventory)
+
+    # Assert
+    assert result["low_stock_items"] == expected
+
+
+def test_summary_category_counts(sample_inventory):
+    # Arrange
+    expected = {
+        "computers": 1,
+        "accessories": 2,
+        "displays": 1,
+    }
+
+    # Act
+    result = calculate_summary(sample_inventory)
+
+    actual = {
+        category: info["count"]
+        for category, info in result["category_counts"].items()
+    }
+
+    # Assert
+    assert actual == expected
+
+
+def test_summary_categories_ignore_capitalization():
+    # Arrange
+    inventory = [
+        {"name": "Mouse", "category": "Accessories", "quantity": 3},
+        {"name": "Keyboard", "category": "ACCESSORIES", "quantity": 5},
+        {"name": "Cable", "category": "accessories", "quantity": 8},
+    ]
+
+    # Act
+    result = calculate_summary(inventory)
+
+    # Assert
+    assert result["category_counts"]["accessories"]["count"] == 3
+    assert len(result["category_counts"]) == 1
+
+
+def test_summary_empty_inventory():
+    # Arrange
+    inventory = []
+
+    # Act
+    result = calculate_summary(inventory)
+
+    # Assert
+    assert result == {
+        "unique_items": 0,
+        "total_quantity": 0,
+        "low_stock_items": 0,
+        "category_counts": {},
+    }
+
+
+@pytest.mark.parametrize(
+    "quantity, expected_low_stock",
+    [
+        (4, 1),
+        (5, 0),
+    ],
+    ids=["quantity-four-low-stock", "quantity-five-not-low-stock"],
+)
+def test_summary_low_stock_boundary(quantity, expected_low_stock):
+    # Arrange
+    inventory = [
+        {
+            "name": "Test Item",
+            "category": "Electronics",
+            "quantity": quantity,
+        }
+    ]
+
+    # Act
+    result = calculate_summary(inventory)
+
+    # Assert
+    assert result["low_stock_items"] == expected_low_stock

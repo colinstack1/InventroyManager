@@ -272,8 +272,9 @@ def search_inventory(inventory):
     view_inventory(matches)
 
 
-def display_summary(inventory):
-    """Display inventory totals, low stock items, and category counts."""
+
+def calculate_summary(inventory):
+    """Calculate inventory totals, low-stock items, and category counts."""
     unique_items = len(inventory)
     total_quantity = 0
     low_stock_items = 0
@@ -284,26 +285,38 @@ def display_summary(inventory):
 
         if item["quantity"] < 5:
             low_stock_items += 1
-        
+
         category = item["category"].strip()
         category_key = category.lower()
 
         if category_key not in category_counts:
             category_counts[category_key] = {
                 "name": category,
-                "count": 0
+                "count": 0,
             }
+
         category_counts[category_key]["count"] += 1
 
+    return {
+        "unique_items": unique_items,
+        "total_quantity": total_quantity,
+        "low_stock_items": low_stock_items,
+        "category_counts": category_counts,
+    }
+
+
+def display_summary(inventory):
+    """Display the inventory summary using calculated results."""
+    summary = calculate_summary(inventory)
 
     print("\nInventory Summary")
-    print(f"Unique items: {unique_items}")
-    print(f"Total quantity: {total_quantity}")
-    print(f"Low-stock items: {low_stock_items}")
+    print(f'Unique items: {summary["unique_items"]}')
+    print(f'Total quantity: {summary["total_quantity"]}')
+    print(f'Low-stock items: {summary["low_stock_items"]}')
 
     print("\nItems by category: ")
 
-    for category_info in category_counts.values():
+    for category_info in summary["category_counts"].values():
         print(f'{category_info["name"]}: {category_info["count"]}')
 
 
