@@ -170,14 +170,12 @@ def remove_item(inventory):
     print(f'Item removed: {removed_item["name"]}')
     save_inventory(inventory, INVENTORY_FILE)
 
-
-def search_inventory(inventory):
-    """Search inventory items by name using case insensitive partial matching."""
-    search_term = input("Enter an item name to search: ").strip()
+def find_matching_items(inventory, search_term):
+    """Return inventory items whose names match a search term."""
+    search_term = search_term.strip()
 
     if not search_term:
-        print("Search term cannot be empty.")
-        return
+        return[]
     
     matches = []
 
@@ -185,10 +183,23 @@ def search_inventory(inventory):
         if search_term.lower() in item["name"].lower():
             matches.append(item)
 
+    return matches
+
+
+def search_inventory(inventory):
+    """Search inventory by name and display matching items."""
+    search_term = input("Enter an item name to search: ").strip()
+
+    if not search_term:
+        print("Search term cannot be empty.")
+        return
+
+    matches = find_matching_items(inventory, search_term)
+
     if not matches:
         print("No inventory items matched your search.")
         return
-    
+
     print("\nSearch Results:")
     view_inventory(matches)
 
